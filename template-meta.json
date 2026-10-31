@@ -1,10 +1,11 @@
 {
- "name": "NOFX | Self-Hosted AI Trading Agent for Crypto & Stocks",
- "short_name": "NOFX Trading",
- "description": "NOFX AI trading agent: LLM strategies on Binance, Hyperliquid & more",
- "category": "AI/ML",
- "image": "https://raw.githubusercontent.com/two-workspaces/nofx/main/icon.png",
- "card_desc": "NOFX, the open-source AI trading system: LLMs (DeepSeek, Qwen, Claude, GPT) run your strategies on Binance, Bybit, OKX, Hyperliquid and Aster, with a web dashboard. Data on a volume, encryption keys that survive restarts, your account claimed on first boot.",
- "deploy_marker": "two-workspaces/nofx",
- "published": false
+  "name": "NOFX | Self-Hosted AI Trading Agent for Crypto & Stocks",
+  "short_name": "NOFX Trading",
+  "description": "NOFX AI trading agent: LLM strategies on Binance, Hyperliquid & more",
+  "category": "AI/ML",
+  "image": "https://raw.githubusercontent.com/two-workspaces/nofx/main/icon.png",
+  "card_desc": "NOFX, the open-source AI trading system: LLMs (DeepSeek, Qwen, Claude, GPT) run your strategies on Binance, Bybit, OKX, Hyperliquid and Aster, with a web dashboard. Data on a volume, encryption keys that survive restarts, your account claimed on first boot.",
+  "deploy_marker": "two-workspaces/nofx",
+  "published": false,
+  "id": "a627a63a-1712-4671-b6fc-a18e1a1e9e5a"
 }
