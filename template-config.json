@@ -1,0 +1,76 @@
+{
+ "services": {
+  "41a8a4fe-17f1-4b29-8067-5e6ad7b2a153": {
+   "icon": "https://raw.githubusercontent.com/two-workspaces/nofx/main/icon.png",
+   "name": "NOFX",
+   "build": {},
+   "deploy": {
+    "startCommand": null,
+    "healthcheckPath": "/health",
+    "restartPolicyType": "ON_FAILURE",
+    "restartPolicyMaxRetries": 10
+   },
+   "source": {
+    "repo": "https://github.com/two-workspaces/nofx",
+    "rootDirectory": null
+   },
+   "variables": {
+    "NOFX_ADMIN_EMAIL": {
+     "defaultValue": "admin@${{RAILWAY_PUBLIC_DOMAIN}}",
+     "description": "Login email for the single NOFX account, created on first boot so nobody else can register first",
+     "isOptional": false
+    },
+    "NOFX_ADMIN_PASSWORD": {
+     "defaultValue": "${{secret(24, \"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\")}}",
+     "description": "Login password, set on first boot only - copy it from here to log in",
+     "isOptional": false
+    },
+    "JWT_SECRET": {
+     "defaultValue": "${{secret(48)}}",
+     "description": "Signs login tokens - auto-generated",
+     "isOptional": false
+    },
+    "DATA_ENCRYPTION_KEY": {
+     "defaultValue": "${{secret(48)}}",
+     "description": "Encrypts the exchange and AI keys you save - auto-generated; never change it or saved keys stop decrypting",
+     "isOptional": false
+    },
+    "CORS_ALLOWED_ORIGINS": {
+     "defaultValue": "https://${{RAILWAY_PUBLIC_DOMAIN}}",
+     "description": "Origins allowed to call the API - add your custom domain here if you set one",
+     "isOptional": false
+    },
+    "TRANSPORT_ENCRYPTION": {
+     "defaultValue": "true",
+     "description": "Browser encrypts API keys before sending them (needs HTTPS, which Railway provides)",
+     "isOptional": false
+    },
+    "EXPERIENCE_IMPROVEMENT": {
+     "defaultValue": "false",
+     "description": "Anonymous usage stats to the NOFX team - set true to opt in",
+     "isOptional": false
+    },
+    "TZ": {
+     "defaultValue": "UTC",
+     "description": "Time zone for logs and trade history, e.g. Europe/Berlin",
+     "isOptional": false
+    },
+    "PORT": {
+     "defaultValue": "8080",
+     "description": "Port the web UI listens on - leave as is",
+     "isOptional": false
+    }
+   },
+   "networking": {
+    "serviceDomains": {
+     "<hasDomain>": {}
+    }
+   },
+   "volumeMounts": {
+    "4c159d34-5c9e-4127-9c4d-a22cf189583f": {
+     "mountPath": "/app/data"
+    }
+   }
+  }
+ }
+}

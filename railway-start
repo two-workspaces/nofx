@@ -1,0 +1,51 @@
+#!/bin/sh
+# NOFX on Railway:
+# - keys persist: DATA_ENCRYPTION_KEY comes from a Railway variable, the RSA key
+#   is generated once onto the volume (upstream regenerates both every boot,
+#   which makes saved exchange keys unreadable after a restart)
+# - the first account is claimed with NOFX_ADMIN_EMAIL/PASSWORD before nginx
+#   opens the public port, so no stranger can register first
+# - the container exits when either process dies, so Railway restarts it
+set -e
+data=/app/data
+mkdir -p "$data"
+
+[ -n "$DATA_ENCRYPTION_KEY" ] || { echo "[railway] DATA_ENCRYPTION_KEY is empty: set it once and never change it"; exit 1; }
+if [ -z "$RSA_PRIVATE_KEY" ]; then
+  if [ ! -s "$data/rsa_private.pem" ]; then
+    (umask 077; openssl genrsa -out "$data/rsa_private.pem" 2048 2>/dev/null)
+    echo "[railway] generated RSA key on the volume"
+  fi
+  RSA_PRIVATE_KEY="$(cat "$data/rsa_private.pem")"
+  export RSA_PRIVATE_KEY
+fi
+
+cd /app
+API_SERVER_PORT=8081 ./nofx &
+be=$!
+ng=
+trap 'kill -TERM $be $ng 2>/dev/null; wait; exit 0' TERM INT
+
+api=http://127.0.0.1:8081/api
+until wget -qO- "$api/health" >/dev/null 2>&1; do
+  kill -0 $be 2>/dev/null || { echo "[railway] backend exited during startup"; exit 1; }
+  sleep 1
+done
+
+if wget -qO- "$api/config" | grep -q '"initialized":false'; then
+  [ ${#NOFX_ADMIN_PASSWORD} -ge 8 ] || { echo "[railway] NOFX_ADMIN_PASSWORD must be 8+ characters"; exit 1; }
+  if wget -qO- --header 'Content-Type: application/json' \
+      --post-data "{\"email\":\"$NOFX_ADMIN_EMAIL\",\"password\":\"$NOFX_ADMIN_PASSWORD\"}" \
+      "$api/register" >/dev/null; then
+    echo "[railway] admin account created: $NOFX_ADMIN_EMAIL"
+  else
+    echo "[railway] admin setup failed; check NOFX_ADMIN_EMAIL is a valid email"; kill $be; exit 1
+  fi
+fi
+
+nginx -g 'daemon off;' &
+ng=$!
+echo "[railway] NOFX is up"
+while kill -0 $be 2>/dev/null && kill -0 $ng 2>/dev/null; do sleep 5; done
+echo "[railway] a process exited; restarting"
+exit 1
